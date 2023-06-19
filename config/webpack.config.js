@@ -71,7 +71,8 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
-
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
 const hasJsxRuntime = (() => {
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === "true") {
     return false;
@@ -346,6 +347,30 @@ module.exports = function (webpackEnv) {
           exclude: /@babel(?:\/|\\{1,2})runtime/,
           test: /\.(js|mjs|jsx|ts|tsx|css)$/,
           loader: require.resolve("source-map-loader"),
+        },
+        {
+          test: lessRegex,
+          exclude: lessModuleRegex,
+          use: getStyleLoaders(
+            {
+              importLoaders: 2,
+              sourceMap: isEnvProduction && shouldUseSourceMap,
+            },
+            "less-loader"
+          ),
+          sideEffects: true,
+        },
+        {
+          test: lessModuleRegex,
+          use: getStyleLoaders(
+            {
+              importLoaders: 2,
+              sourceMap: isEnvProduction && shouldUseSourceMap,
+              modules: true,
+              getLocalIdent: getCSSModuleLocalIdent,
+            },
+            "less-loader"
+          ),
         },
         {
           // "oneOf" will traverse all following loaders until one will
